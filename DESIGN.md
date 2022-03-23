@@ -1,18 +1,44 @@
-# CloudStruct Cardano Infrastructure Repo Planning and Design
+# Cardano Infrastructure Repository Design
+## Goals
+* Provide a reliable open-source project that anyone can leverage to build their\
+cardano infrastructure on-premise or in the cloud.
+* Create automation that builds repeatable, maintainable, and secure Cardano\
+infrastructure.
+* Encourage community interaction and feedback to use in improving the automation.
+
+## Tools
+The following open-source tools are used to execute the code in this repository  
+and a brief explanation of why we chose them:
+* [Terraform](https://www.terraform.io/intro)
+  * Terraform is an industry leading tool in rapidly provisioning cloud based\
+infrastructure.
+  * Terraform removes the burden of tracking the myriad of resources required\
+to build infrastructure.
+  * With its [Directed Acyclic Graph](https://www.terraform.io/internals/graph) Terraform makes it easy to ensure\
+resources are provisioned in the correct order and leverage the output of one\
+resource as the input to another.
+* [Ansible](https://www.ansible.com/overview/how-ansible-works)
+  * Ansible is an extremely accessible automation framework that simplifies\
+repetitive, complex, and inter-dependent tasks.
+  * With an extensive [module support](https://docs.ansible.com/ansible/latest/collections/index_module.html) Ansible abstracts API and System interactions\
+so we can focus on what the automation does and not how it does it.
+  * Similar to Terraform, Ansible allows us to avoid reinventing the wheel and\
+leverage existing and well maintained roles.
+
 ## Main
-[cardano-infrastructure](https://github.com/cloudstruct/cardano-infrastructure) is a terraform project which when forked or cloned  
-and applied with a valid YAML config will produce a functioning, secure, and  
+[cardano-infrastructure](https://github.com/cloudstruct/cardano-infrastructure) is a Terraform project which when forked or cloned  
+and applied with a valid YAML config produces a functioning, secure, and  
 maintainable Cardano deployment.  
 
-`Cardano Deployment` in this case is defined as any combination of Cardano nodes  
+`Cardano Deployment` is defined as any combination of Cardano nodes  
 (Passive, Relay, Block Producer) as configured in the YAML input.  
 
-The repo will pull in common well maintained open-source terraform modules as  
+The repo will pull in common well maintained open-source Terraform modules as  
 required.  
 
 The code is config-driven with configuration supplied via YAML in the documented  
 and exemplified format. `config-driven` in this context means that within a given release of  
-[terraform-cloud-cardano-stake-pool](https://github.com/cloudstruct/terraform-cloud-cardano-stake-pool), no terraform HCL code should require  
+[terraform-cloud-cardano-stake-pool](https://github.com/cloudstruct/terraform-cloud-cardano-stake-pool), no Terraform HCL code should require  
 modification.  
 
 ### Network
@@ -78,8 +104,8 @@ an infrastructure that requires service discovery.
   and take appropriate action based on the provided settings.
 * ETCD will run on each provisioned node when enabled
 
-## Modules
-#### terraform-cloud-userdata-launcher
+## External Repositories
+### terraform-cloud-userdata-launcher
 [terraform-cloud-userdata-launcher](https://github.com/cloudstruct/terraform-cloud-userdata-launcher) is a Terraform module that creates required  
 infrastructure to launch a cloud 'instance' (Virtual Machine) and runs cloud-init  
 based on input provided to this module. The product is configurable  
@@ -93,7 +119,7 @@ an EC2 instance.
   the instance at boot-time via HTTP(S)
 
 #### Design
-This terraform module will provide the following cloud objects with non-required   
+This Terraform module will provide the following cloud objects with non-required   
 features enabled via feature flags:
 * Virtual Machine instance
 * Ability to take in security group IDs and apply to created instances
@@ -119,11 +145,11 @@ installed.
 * The ansible code will provision Passive, Relay, and Block Producing nodes.  
   It will also continue to support any other Cardano node types required in the  
   future.
-* A dynamically provisioned ETCD cluster is used for service discovery of  
-  other nodes
+* A dynamically provisioned ETCD cluster is used for service discovery of\
+other nodes
 * The workflow would be:
-  * Create a TF module instantiation of [terraform-cloud-userdata-launcher](https://github.com/cloudstruct/terraform-cloud-userdata-launcher) which  
-    provides required user-data input.
+  * Create a TF module instantiation of [terraform-cloud-userdata-launcher](https://github.com/cloudstruct/terraform-cloud-userdata-launcher) which\
+provides required user-data input.
   * The above input is passed to this Ansible playbook.
   * Ansible runs and produces a node and any required output.
   * If enabled, the node will connect itself to a dynamically provisioned ETCD\
