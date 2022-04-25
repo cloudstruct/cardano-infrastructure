@@ -6,6 +6,21 @@ locals {
     try(vpc.region, "") == ""
   }
 
+  aws_s3_bucket_list = flatten([
+    for network, networkConfig in local.aws_vpc_default :
+    flatten([
+      for bucketName, bucketConfig in try(local.config.aws[network].s3.buckets, {}) :
+      {
+        "name"       = bucketName,
+        "acl"        = bucketConfig.acl,
+        "versioning" = bucketConfig.versioning
+        "network"    = network
+      }
+    ])
+  ])
+
+  aws_s3_bucket_map = { for idx, bucket in local.aws_s3_bucket_list : "${bucket.network}-${bucket.name}" => bucket }
+
   aws_vpc_sa_east1 = { for i, vpc in local.network_vars :
     vpc.name => vpc if try(vpc.enabled, true) &&
     try(vpc.cloud_provider, "aws") == "aws" &&
