@@ -5,6 +5,9 @@
 *.tfstate
 *.tfstate.*
 
+# Ignore Lock file, use required_providers versions
+terraform/.terraform.lock.hcl
+
 # Crash log files
 crash.log
 
