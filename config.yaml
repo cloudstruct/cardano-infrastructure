@@ -3,6 +3,6 @@ network:
   - name: cardano-node
 
 objectstorage:
-  - name: "cs-spo-cloutinit-metadata"
+  - name: "cardano-node-cloudinit-metadata"
     acl: "public-read"
     logging: true
