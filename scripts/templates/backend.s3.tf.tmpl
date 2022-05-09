@@ -1,0 +1,10 @@
+terraform {
+  backend "s3" {
+    region         = "REPLACE_REGION"
+    bucket         = "REPLACE_BUCKET"
+    key            = "cardanoinfra.tfstate"
+    #dynamodb_table = "REPLACE_NOSQL_TABLE"
+    encrypt        = true
+  }
+}
+
