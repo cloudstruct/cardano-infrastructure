@@ -53,25 +53,28 @@ locals {
   aws_s3_buckets_default = {
     for idx, bucket in local.objectstorage_vars :
     bucket.name => bucket if try(bucket.region, "") == "" &&
+    try(bucket.terraform_state, false) == false &&
     try(bucket.cloud_provider, "aws") == "aws"
   }
 
   aws_s3_buckets_sa_east1 = {
     for idx, bucket in local.objectstorage_vars :
     bucket.name => bucket if try(bucket.region, "") == "sa-east-1" &&
+    try(bucket.terraform_state, false) == false &&
     try(bucket.cloud_provider, "aws") == "aws"
   }
 
   aws_s3_buckets_us_east1 = {
     for idx, bucket in local.objectstorage_vars :
     bucket.name => bucket if try(bucket.region, "") == "us-east-1" &&
+    try(bucket.terraform_state, false) == false &&
     try(bucket.cloud_provider, "aws") == "aws"
   }
 
   aws_s3_buckets_us_east2 = {
     for idx, bucket in local.objectstorage_vars :
     bucket.name => bucket if try(bucket.region, "") == "us-east-2" &&
+    try(bucket.terraform_state, false) == false &&
     try(bucket.cloud_provider, "aws") == "aws"
   }
-
 }

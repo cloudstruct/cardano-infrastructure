@@ -1,7 +1,7 @@
 module "s3_logging_bucket_default" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_default :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   providers = {
@@ -13,7 +13,7 @@ module "s3_logging_bucket_default" {
 
   bucket = lower("${each.key}-logging")
 
-  acl = try(each.value.acl, "private")
+  acl = "private"
 
   versioning = {
     enabled = false
@@ -32,7 +32,7 @@ module "s3_logging_bucket_default" {
 module "s3_logging_bucket_sa_east1" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_sa_east1 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   providers = {
@@ -44,7 +44,7 @@ module "s3_logging_bucket_sa_east1" {
 
   bucket = lower("${each.key}-logging")
 
-  acl = try(each.value.acl, "private")
+  acl = "private"
 
   versioning = {
     enabled = false
@@ -63,7 +63,7 @@ module "s3_logging_bucket_sa_east1" {
 module "s3_logging_bucket_us_east1" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_us_east1 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   providers = {
@@ -75,7 +75,7 @@ module "s3_logging_bucket_us_east1" {
 
   bucket = lower("${each.key}-logging")
 
-  acl = try(each.value.acl, "private")
+  acl = "private"
 
   versioning = {
     enabled = false
@@ -94,11 +94,11 @@ module "s3_logging_bucket_us_east1" {
 module "s3_logging_bucket_us_east2" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_us_east2 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   providers = {
-    aws = aws.us-east-1
+    aws = aws.us-east-2
   }
 
   source  = "terraform-aws-modules/s3-bucket/aws"
@@ -106,7 +106,7 @@ module "s3_logging_bucket_us_east2" {
 
   bucket = lower("${each.key}-logging")
 
-  acl = try(each.value.acl, "private")
+  acl = "private"
 
   versioning = {
     enabled = false
@@ -125,7 +125,7 @@ module "s3_logging_bucket_us_east2" {
 module "s3_buckets_default_with_logging" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_default :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   source  = "terraform-aws-modules/s3-bucket/aws"
@@ -192,7 +192,7 @@ module "s3_buckets_default_without_logging" {
 module "s3_buckets_sa_east1_with_logging" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_sa_east1 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   source  = "terraform-aws-modules/s3-bucket/aws"
@@ -259,7 +259,7 @@ module "s3_buckets_sa_east1_without_logging" {
 module "s3_buckets_us_east1_with_logging" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_us_east1 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   source  = "terraform-aws-modules/s3-bucket/aws"
@@ -326,14 +326,14 @@ module "s3_buckets_us_east1_without_logging" {
 module "s3_buckets_us_east2_with_logging" {
   for_each = {
     for bucketName, bucketConfig in local.aws_s3_buckets_us_east2 :
-    bucketName => bucketConfig if try(bucketConfig.logging, false) == true
+    bucketName => bucketConfig if try(bucketConfig.logging, false)
   }
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "v3.1.0"
 
   providers = {
-    aws = aws.us-east-1
+    aws = aws.us-east-2
   }
 
   bucket = lower(each.key)
@@ -369,7 +369,7 @@ module "s3_buckets_us_east2_without_logging" {
   version = "v3.1.0"
 
   providers = {
-    aws = aws.us-east-1
+    aws = aws.us-east-2
   }
 
   bucket = lower(each.key)
