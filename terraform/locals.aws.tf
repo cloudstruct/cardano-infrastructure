@@ -1,5 +1,28 @@
 locals {
-  aws_default_region = "us-east-2"
+  # IP address
+  aws_eip_default = { for i, eip in local.ipaddress_vars:
+    eip.name => eip if try(eip.enabled, true) &&
+    try(eip.cloud_provider, "aws") == "aws" &&
+    try(eip.region, "") == ""
+  }
+
+  aws_eip_sa_east1 = {for i, eip in local.ipaddress_vars:
+    eip.name => eip if try(eip.enabled, true) &&
+    try(eip.cloud_provider, "aws") == "aws" &&
+    try(eip.region, "") == "sa-east-1"
+  }
+
+  aws_eip_us_east1 = {for i, eip in local.ipaddress_vars:
+    eip.name => eip if try(eip.enabled, true) &&
+    try(eip.cloud_provider, "aws") == "aws" &&
+    try(eip.region, "") == "us-east-1"
+  }
+
+  aws_eip_us_east2 = {for i, eip in local.ipaddress_vars:
+    eip.name => eip if try(eip.enabled, true) &&
+    try(eip.cloud_provider, "aws") == "aws" &&
+    try(eip.region, "") == "us-east-2"
+  }
 
   # Network
   aws_vpc_default = { for i, vpc in local.network_vars :

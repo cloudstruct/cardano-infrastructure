@@ -1,4 +1,7 @@
 ---
+ipaddress:
+  - name: cardano-node
+
 network:
   - name: cardano-node
 
