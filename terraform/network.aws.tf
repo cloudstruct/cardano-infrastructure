@@ -1,6 +1,6 @@
 module "aws_vpc_default" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.0"
+  version = "3.15.0"
 
   providers = {
     aws = aws
@@ -21,7 +21,7 @@ module "aws_vpc_default" {
 
 module "aws_vpc_sa_east1" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.0"
+  version = "3.15.0"
 
   providers = {
     aws = aws.sa-east-1
@@ -42,7 +42,7 @@ module "aws_vpc_sa_east1" {
 
 module "aws_vpc_us_east1" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.0"
+  version = "3.15.0"
 
   providers = {
     aws = aws.us-east-1
@@ -63,7 +63,7 @@ module "aws_vpc_us_east1" {
 
 module "aws_vpc_us_east2" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.0"
+  version = "3.15.0"
 
   providers = {
     aws = aws.us-east-2
