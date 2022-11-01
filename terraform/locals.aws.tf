@@ -90,7 +90,7 @@ locals {
   ])
 
   aws_sg_us_east1 = flatten([
-    for vpcName, vpcConfig in local.aws_vpc_default : [
+    for vpcName, vpcConfig in local.aws_vpc_us_east1 : [
     for sg in concat(try(vpcConfig.security_groups, []), local.security_groups) : merge({ "vpc" : vpcName }, sg)]
     if try(vpcConfig.enabled, true) &&
     try(vpcConfig.cloud_provider, "aws") == "aws" &&
@@ -98,7 +98,7 @@ locals {
   ])
 
   aws_sg_us_east2 = flatten([
-    for vpcName, vpcConfig in local.aws_vpc_default : [
+    for vpcName, vpcConfig in local.aws_vpc_us_east2 : [
     for sg in concat(try(vpcConfig.security_groups, []), local.security_groups) : merge({ "vpc" : vpcName }, sg)]
     if try(vpcConfig.enabled, true) &&
     try(vpcConfig.cloud_provider, "aws") == "aws" &&
@@ -106,7 +106,7 @@ locals {
   ])
 
   aws_sg_sa_east1 = flatten([
-    for vpcName, vpcConfig in local.aws_vpc_default : [
+    for vpcName, vpcConfig in local.aws_vpc_sa_east1 : [
     for sg in concat(try(vpcConfig.security_groups, []), local.security_groups) : merge({ "vpc" : vpcName }, sg)]
     if try(vpcConfig.enabled, true) &&
     try(vpcConfig.cloud_provider, "aws") == "aws" &&

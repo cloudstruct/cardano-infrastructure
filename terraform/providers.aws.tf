@@ -1,8 +1,8 @@
 # Since terraform does not allow dynamic providers, we need one for each region
 
-# Our default, if no region is provided, is to use us-east-2
+# Our default, if no region is provided, is to use us-east-1
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
 
 provider "aws" {
