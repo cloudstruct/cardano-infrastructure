@@ -1,0 +1,87 @@
+#!/bin/bash
+
+apt-get install -y awscli jq unzip python3-pip python3-venv python3-docker
+
+export AWS_DEFAULT_REGION=$(curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
+INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+INSTANCE_IP=$(ip route get 1.2.3.4 | grep via | awk '{ print $7 }')
+
+###
+# Mount data volume
+
+VOLUME_ID=${EBS_VOLUME_ID}
+NVME_DEVICE=nvme1n1
+MOUNT_DIR=/data
+
+(
+set -x
+ATTACHED=0
+until [ "$ATTACHED" -eq 1 ]
+do
+  ATTACHED_INSTANCE=$(aws ec2 describe-volumes --volume-ids "$VOLUME_ID" | jq -r '.Volumes[] | .Attachments[].InstanceId' | sort -u)
+  echo "INFO: Attached instance: ${ATTACHED_INSTANCE}"
+  if [[ "$ATTACHED_INSTANCE" == "$INSTANCE_ID" ]]; then
+    echo "INFO: EBS Volume ${VOLUME_ID} attached to instance ${INSTANCE_ID} already."
+    ATTACHED=1
+  else
+    aws ec2 attach-volume --volume-id "$VOLUME_ID" --instance-id "$INSTANCE_ID" --device /dev/sdf
+    if test $? -eq 0; then
+      echo "INFO: Attached EBS Volume ${VOLUME_ID} to instance ${INSTANCE_ID}."
+      ATTACHED=1
+    else
+      echo "Failed to attach EBS volume, retrying after 2s pause..."
+      sleep 2
+    fi
+  fi
+done
+)
+
+# Wait for device to show up
+while true; do
+  [[ -e /sys/block/${NVME_DEVICE} ]] && break
+  echo "Waiting for device ${NVME_DEVICE} to appear..."
+  sleep 2
+done
+
+set -x
+
+# Check for existing filesystem, and format if none found
+if ! dumpe2fs /dev/${NVME_DEVICE} >& /dev/null; then
+  mkfs.ext4 /dev/${NVME_DEVICE}
+fi
+
+mkdir -p ${MOUNT_DIR}
+
+echo "/dev/${NVME_DEVICE}  ${MOUNT_DIR}  ext4  noatime  0  0" >> /etc/fstab
+
+mount ${MOUNT_DIR}
+
+###
+# Swap file
+SWAP_FILE=${MOUNT_DIR}/swap.file
+if ! test -e ${SWAP_FILE}; then
+  dd if=/dev/zero of=${SWAP_FILE} bs=1M count=10240
+  chmod 0600 ${SWAP_FILE}
+  mkswap ${SWAP_FILE}
+  echo "${SWAP_FILE}  none  swap  sw  0  0" >> /etc/fstab
+fi
+swapon ${SWAP_FILE}
+
+###
+# Run Ansible
+
+python3 -m venv /root/.venv
+. /root/.venv/bin/activate
+aws s3 cp s3://${OBJECT_STORAGE_BOOTSTRAP_BUCKET}/ansible.zip /root/ansible.zip
+mkdir /root/ansible
+cd /root/ansible
+unzip -o /root/ansible.zip
+pip install ansible==6.6.0 docker requests
+ansible-galaxy install -r requirements.yml
+ansible-playbook \
+  local.yml \
+  -e POOL=${CARDANO_POOL_NAME} \
+  -e RELAY_NODES=${CARDANO_RELAY_LIST} \
+  --diff \
+  -c local \
+  --limit localhost
