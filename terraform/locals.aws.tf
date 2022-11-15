@@ -142,4 +142,28 @@ locals {
     try(bucket.cloud_provider, "aws") == "aws"
   }
 
+  # Virtual Machines
+  aws_vm_default = { for idx, vm in local.vm_vars :
+    vm.name => vm if try(vm.enabled, true) &&
+    try(vm.cloud_provider, "aws") == "aws" &&
+    try(vm.region, "") == ""
+  }
+
+  aws_vm_sa_east1 = { for idx, vm in local.vm_vars :
+    vm.name => vm if try(vm.enabled, true) &&
+    try(vm.cloud_provider, "aws") == "aws" &&
+    try(vm.region, "") == "sa-east-1"
+  }
+
+  aws_vm_us_east1 = { for idx, vm in local.vm_vars :
+    vm.name => vm if try(vm.enabled, true) &&
+    try(vm.cloud_provider, "aws") == "aws" &&
+    try(vm.region, "") == "us-east-1"
+  }
+
+  aws_vm_us_east2 = { for idx, vm in local.vm_vars :
+    vm.name => vm if try(vm.enabled, true) &&
+    try(vm.cloud_provider, "aws") == "aws" &&
+    try(vm.region, "") == "us-east-2"
+  }
 }
