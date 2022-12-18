@@ -71,7 +71,7 @@ module "virtual_machines_default" {
   user_data = try(
     base64encode(
       templatefile(
-        "${path.root}/../templates/cloudinit/${try(each.value.cloudinit_template, "cardano-node.tftpl")}",
+        "${path.root}/../templates/cloudinit/${try(each.value.cloudinit_template, "cardano-node.aws.tftpl")}",
         {
           EBS_VOLUME_ID                   = aws_ebs_volume.node_data[each.key].id
           OBJECT_STORAGE_BOOTSTRAP_BUCKET = local.bootstrap_bucket
