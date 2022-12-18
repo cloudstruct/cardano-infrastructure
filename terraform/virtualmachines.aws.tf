@@ -3,7 +3,7 @@ locals {
   # (virtual_machines.instances[x].vpc, virtual_machines.instances[x].name)
   # With security group name precedence of
   # (virtual_machines.instances[x].security_group_name, (virtual_machines.instances[x].name)
-  default_vms_sgs = flatten([
+  default_aws_vms_sgs = flatten([
     for vm in local.aws_vm_default : [
       for sg in local.aws_sg_default : try(
         module.aws_sg_default["${vm.vpc}#${vm.security_group_name}"].security_group_id,
@@ -17,17 +17,17 @@ locals {
 
   default_vpc_az = try([for az in module.aws_vpc_default["cardano-node"].azs : az if length(module.aws_vpc_default["cardano-node"].azs) == 1][0], false)
 
-  all_relays         = [for vm in local.vm_vars.instances : vm.name if try(vm.block_producer, false) == false]
-  vm_instance_relays = { for vm in local.vm_vars.instances : vm.name => try(vm.relays, local.all_relays) }
+  all_relays         = [for vm in local.machine_vars : vm.name if try(vm.block_producer, false) == false]
+  vm_instance_relays = { for vm in local.machine_vars : vm.name => try(vm.relays, local.all_relays) }
 
 }
 
 resource "aws_ebs_volume" "node_data" {
   for_each = local.aws_vm_default
 
-  availability_zone = local.default_vpc_az != false ? local.default_vpc_az : try(each.value.az, local.vm_vars.default_availability_zone)
+  availability_zone = local.default_vpc_az != false ? local.default_vpc_az : try(each.value.az, local.machine_vars.default_availability_zone)
 
-  size = try(each.value.data_volume_size, local.vm_vars.default_data_volume_size, 120)
+  size = try(each.value.data_volume_size, local.machine_vars.default_data_volume_size, 120)
   type = "gp3"
 
   tags = merge(
@@ -65,7 +65,7 @@ module "virtual_machines_default" {
 
   name          = each.value.name
   image_id      = data.aws_ami.instance_image[each.key].image_id
-  instance_type = try(each.value.instance_type, local.vm_vars.default_instance_type)
+  instance_type = try(each.value.instance_type, local.machine_vars.default_instance_type, "m6g.large")
   key_name      = try(each.value.key_name, null)
 
   user_data = try(
@@ -97,7 +97,7 @@ module "virtual_machines_default" {
   iam_role_tags               = merge(local.default_tags, try(each.value.tags, {}))
   iam_role_policies           = { (each.key) = aws_iam_policy.policy[each.key].arn }
 
-  security_groups = try(each.value.sg_ids, local.default_vms_sgs, null)
+  security_groups = try(each.value.sg_ids, local.default_aws_vms_sgs, null)
 
   block_device_mappings = [
     {
