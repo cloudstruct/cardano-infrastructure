@@ -69,7 +69,7 @@ resource "aws_ebs_volume" "node_data_default" {
   tags = merge(
     local.default_tags,
     {
-      Name = "node-${each.key}"
+      Name = "${each.key}"
     },
   )
 }
@@ -86,7 +86,7 @@ resource "aws_ebs_volume" "node_data_sa_east1" {
   tags = merge(
     local.default_tags,
     {
-      Name = "node-${each.key}"
+      Name = "${each.key}"
     },
   )
 }
@@ -103,7 +103,7 @@ resource "aws_ebs_volume" "node_data_us_east1" {
   tags = merge(
     local.default_tags,
     {
-      Name = "node-${each.key}"
+      Name = "${each.key}"
     },
   )
 }
@@ -120,7 +120,7 @@ resource "aws_ebs_volume" "node_data_us_east2" {
   tags = merge(
     local.default_tags,
     {
-      Name = "node-${each.key}"
+      Name = "${each.key}"
     },
   )
 }
